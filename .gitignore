@@ -1,0 +1,22 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+
+# Editor settings
+.vscode/*
+!.vscode/extensions.json
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Logs
+*.log

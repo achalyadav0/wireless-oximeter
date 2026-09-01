@@ -8,10 +8,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.extensions import db
 
 
-class Device(db.Model):
-    """Represents a patient-side sensing device such as an ESP32 oximeter."""
+class Sensor(db.Model):
+    """Represents a physical sensor attached to a patient-side device."""
 
-    __tablename__ = "devices"
+    __tablename__ = "sensors"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -19,26 +19,30 @@ class Device(db.Model):
         default=uuid.uuid4,
     )
 
-    device_uid: Mapped[str] = mapped_column(
+    sensor_uid: Mapped[str] = mapped_column(
         String(100),
         unique=True,
         nullable=False,
         index=True,
     )
 
-    device_type: Mapped[str] = mapped_column(
+    sensor_type: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
-        default="ESP32_OXIMETER",
     )
 
-    firmware_version: Mapped[str | None] = mapped_column(
-        String(50),
+    manufacturer: Mapped[str | None] = mapped_column(
+        String(100),
         nullable=True,
     )
 
-    hardware_version: Mapped[str | None] = mapped_column(
-        String(50),
+    model: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    serial_number: Mapped[str | None] = mapped_column(
+        String(100),
         nullable=True,
     )
 
@@ -48,16 +52,11 @@ class Device(db.Model):
         default="ACTIVE",
     )
 
-    gateway_id: Mapped[uuid.UUID | None] = mapped_column(
+    device_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("edge_gateways.id"),
-        nullable=True,
+        ForeignKey("devices.id"),
+        nullable=False,
         index=True,
-    )
-
-    last_seen_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -73,11 +72,11 @@ class Device(db.Model):
         nullable=False,
     )
 
-    edge_gateway: Mapped["EdgeGateway | None"] = relationship(
-        back_populates="devices",
+    device: Mapped["Device"] = relationship(
+        back_populates="sensors",
     )
-    
-    sensors: Mapped[list["Sensor"]] = relationship(
-        back_populates="device",
-        cascade="all, delete-orphan",
+
+    measurement_types: Mapped[list["MeasurementType"]] = relationship(
+        secondary="sensor_measurement_types",
+        back_populates="sensors",
     )

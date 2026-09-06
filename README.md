@@ -13,7 +13,20 @@ Wireless pulse oximeter platform for collecting, transporting, storing, and view
 - `simulator/`: simulated device data sources
 - `tests/`: cross-component and integration tests
 
-See `docs/architecture/system-architecture.md` for the initial system overview.
+## Local Development
 
-See `docs/mqtt/telemetry-ingestion.md` for local MQTT telemetry setup, payloads,
-and troubleshooting.
+The local development stack uses PostgreSQL for persistence and Mosquitto as
+the MQTT broker. Start both services from the repository root with:
+
+```bash
+docker compose -f deployment/docker-compose.yml up -d postgres mosquitto
+```
+
+The backend MQTT worker consumes device vitals and persists heart-rate and
+SpO2 observations. Follow the MQTT guide for database migrations, environment
+variables, payload examples, and worker startup.
+
+## Documentation
+
+- [System architecture](docs/architecture/system-architecture.md)
+- [MQTT telemetry ingestion](docs/mqtt/telemetry-ingestion.md)

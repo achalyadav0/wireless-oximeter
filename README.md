@@ -14,3 +14,6 @@ Wireless pulse oximeter platform for collecting, transporting, storing, and view
 - `tests/`: cross-component and integration tests
 
 See `docs/architecture/system-architecture.md` for the initial system overview.
+
+See `docs/mqtt/telemetry-ingestion.md` for local MQTT telemetry setup, payloads,
+and troubleshooting.

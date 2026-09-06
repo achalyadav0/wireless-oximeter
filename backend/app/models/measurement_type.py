@@ -70,3 +70,7 @@ class MeasurementType(db.Model):
         secondary="sensor_measurement_types",
         back_populates="measurement_types",
     )
+
+    observations: Mapped[list["Observation"]] = relationship(
+        back_populates="measurement_type",
+    )

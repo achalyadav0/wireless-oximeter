@@ -80,3 +80,13 @@ class Sensor(db.Model):
         secondary="sensor_measurement_types",
         back_populates="sensors",
     )
+
+    observations: Mapped[list["Observation"]] = relationship(
+        back_populates="sensor",
+        cascade="all, delete-orphan",
+    )
+
+    ppg_recordings: Mapped[list["PPGRecording"]] = relationship(
+        back_populates="sensor",
+        cascade="all, delete-orphan",
+    )

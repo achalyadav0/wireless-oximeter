@@ -15,5 +15,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: wireless-oximeter-mosquitto
+    restart: unless-stopped
+
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
 volumes:
   postgres_data:

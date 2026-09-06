@@ -68,3 +68,18 @@ class Patient(db.Model):
     assignments: Mapped[list["PatientAssignment"]] = relationship(
         back_populates="patient",
     )
+
+    observations: Mapped[list["Observation"]] = relationship(
+        back_populates="patient",
+        cascade="all, delete-orphan",
+    )
+
+    ppg_recordings: Mapped[list["PPGRecording"]] = relationship(
+        back_populates="patient",
+        cascade="all, delete-orphan",
+    )
+
+    alerts: Mapped[list["Alert"]] = relationship(
+        back_populates="patient",
+        cascade="all, delete-orphan",
+    )

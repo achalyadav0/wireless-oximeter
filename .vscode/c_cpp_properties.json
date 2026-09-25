@@ -1,0 +1,32 @@
+{
+    "configurations": [
+        {
+            "name": "PlatformIO ESP32-S3",
+            "includePath": [
+                "${workspaceFolder}/device/oximeter/include",
+                "${workspaceFolder}/device/oximeter/src",
+                "${workspaceFolder}/device/oximeter/.pio/libdeps/esp32-s3-devkitc-1/**",
+                "${env:HOME}/.platformio/packages/framework-arduinoespressif32/cores/esp32",
+                "${env:HOME}/.platformio/packages/framework-arduinoespressif32/variants/esp32s3",
+                "${env:HOME}/.platformio/packages/framework-arduinoespressif32/libraries/**",
+                "${env:HOME}/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/**",
+                "${env:HOME}/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/dio_qspi/include"
+            ],
+            "defines": [
+                "ARDUINO=10819",
+                "ARDUINO_USB_CDC_ON_BOOT=1"
+            ],
+            "compilerPath": "${env:HOME}/.platformio/packages/toolchain-xtensa-esp32s3/bin/xtensa-esp32s3-elf-gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-gcc",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/device/oximeter",
+                    "${env:HOME}/.platformio/packages/framework-arduinoespressif32"
+                ]
+            }
+        }
+    ],
+    "version": 4
+}

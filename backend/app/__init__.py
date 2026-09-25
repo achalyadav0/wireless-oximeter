@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, render_template
 from sqlalchemy import text
 
 from app.config import Config
 from app.extensions import db, migrate
+from app.dashboard.state import get_devices
 
 
 
@@ -34,6 +35,14 @@ def create_app(config_class=Config):
             "service": "wireless-oximeter-backend",
             "database": database_status,
         }
-        
+
+
+    @app.get("/api/devices")
+    def devices_api():
+        return get_devices()
+
+    @app.get("/")
+    def dashboard():
+        return render_template("index.html")
 
     return app

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Wireless Oximeter</title>
+	<style>
+		:root { color-scheme: light; font-family: system-ui, sans-serif; }
+		body { margin: 0; background: #f4f7f8; color: #18323a; }
+		main { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+		header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+		h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.4rem); }
+		#updated { color: #537078; font-size: 0.9rem; }
+		#devices { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 2rem; }
+		article { background: white; border: 1px solid #d6e1e3; border-radius: 8px; padding: 1.25rem; box-shadow: 0 4px 16px rgb(24 50 58 / 8%); }
+		h2 { margin-top: 0; font-size: 1.2rem; }
+		dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0; }
+		dt { color: #537078; }
+		dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+		.empty { color: #537078; }
+	</style>
+</head>
+<body>
+	<main>
+		<header>
+			<h1>Wireless Oximeter</h1>
+			<span id="updated">Waiting for telemetry</span>
+		</header>
+		<section id="devices" aria-live="polite"><p class="empty">No devices connected.</p></section>
+	</main>
+	<script>
+		const devices = document.querySelector("#devices");
+		const updated = document.querySelector("#updated");
+
+		function value(value, fallback = "-") {
+			return value === null || value === undefined ? fallback : value;
+		}
+
+		async function refresh() {
+			try {
+				const response = await fetch("/api/devices");
+				if (!response.ok) throw new Error(`HTTP ${response.status}`);
+				const data = await response.json();
+				const entries = Object.values(data);
+				devices.innerHTML = entries.length ? entries.map((device) => `
+					<article>
+						<h2>${device.device_id}</h2>
+						<dl>
+							<dt>Samples</dt><dd>${value(device.sample_count, 0)}</dd>
+							<dt>Sample rate</dt><dd>${value(device.sample_rate)} Hz</dd>
+							<dt>Red channel</dt><dd>${device.red.length} values</dd>
+							<dt>Infrared channel</dt><dd>${device.ir.length} values</dd>
+							<dt>Received</dt><dd>${new Date(device.received_at).toLocaleTimeString()}</dd>
+						</dl>
+					</article>`).join("") : '<p class="empty">No devices connected.</p>';
+				updated.textContent = `Updated ${new Date().toLocaleTimeString()}`;
+			} catch (error) {
+				updated.textContent = "Backend unavailable";
+				console.error(error);
+			}
+		}
+
+		refresh();
+		setInterval(refresh, 2000);
+	</script>
+</body>
+</html>

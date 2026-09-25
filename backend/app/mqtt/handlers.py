@@ -1,13 +1,10 @@
 import json
 
-from app.services.telemetry_service import TelemetryService
-
-
-telemetry_service = TelemetryService()
+from app.dashboard.state import update_device
 
 
 def handle_vitals_message(topic: str, payload: str):
-    """Process an incoming vitals MQTT message."""
+    """Process an incoming PPG MQTT message."""
 
     try:
         data = json.loads(payload)
@@ -15,19 +12,18 @@ def handle_vitals_message(topic: str, payload: str):
         print("Invalid JSON received.")
         return
 
-    try:
-        device_uid = data["device_uid"]
-        heart_rate = data["heart_rate"]
-        spo2 = data["spo2"]
-    except KeyError as exc:
-        print(f"Missing telemetry field: {exc}")
+    if "device_id" not in data:
+        print("Missing device_id")
         return
 
-    try:
-        telemetry_service.process_vitals(
-            device_uid=device_uid,
-            heart_rate=heart_rate,
-            spo2=spo2,
-        )
-    except ValueError as exc:
-        print(f"Telemetry rejected: {exc}")
+    if "red" not in data or "ir" not in data:
+        print(f"Invalid PPG packet from {data['device_id']}")
+        return
+
+    update_device(data)
+
+    print(
+        f"PPG received: "
+        f"{data['device_id']} "
+        f"({data.get('sample_count', 0)} samples)"
+    )

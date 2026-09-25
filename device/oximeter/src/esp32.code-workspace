@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../esp32"
+		},
+		{
+			"name": "oximeter",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}

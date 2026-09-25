@@ -20,7 +20,7 @@ class MQTTClient:
 
         self.topic = os.getenv(
             "MQTT_VITALS_TOPIC",
-            "oximeter/devices/+/vitals",
+            "oximeter/+/ppg",
         )
 
         self.message_handler = message_handler

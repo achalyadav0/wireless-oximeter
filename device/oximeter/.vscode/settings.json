@@ -1,0 +1,12 @@
+{
+    "terminal.integrated.profiles.osx": {
+        "PlatformIO": {
+            "path": "/bin/zsh",
+            "args": ["-l"],
+            "env": {
+                "PATH": "/Users/achalyadav/Library/Python/3.10/bin:${env:PATH}"
+            }
+        }
+    },
+    "terminal.integrated.defaultProfile.osx": "PlatformIO"
+}

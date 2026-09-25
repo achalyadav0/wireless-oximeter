@@ -41,7 +41,10 @@ PPG packet held in the backend process. The device API is available at
 
 The ESP32-S3 firmware is in `device/oximeter/` and uses PlatformIO. Copy
 `device/oximeter/include/secrets.example.h` to `secrets.h`, set the Wi-Fi and
-MQTT values, then build and upload from that directory:
+MQTT values, then build and upload from that directory. When `secrets.h` is
+absent, the build uses placeholder values from the tracked example so
+IntelliSense and clean checkouts still compile; real credentials are required
+for the device to connect.
 
 ```bash
 cd device/oximeter

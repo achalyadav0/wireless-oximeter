@@ -26,7 +26,9 @@ cp include/secrets.example.h include/secrets.h
 
 Edit `include/secrets.h` with the local Wi-Fi network, MQTT broker address,
 device identifier, and device-specific topics. The file is ignored by Git and
-must not contain credentials that should be committed.
+must not contain credentials that should be committed. If the file is absent,
+the firmware falls back to `include/secrets.example.h`, which is useful for
+IntelliSense and clean builds but does not provide working network credentials.
 
 Install PlatformIO, then build and upload:
 

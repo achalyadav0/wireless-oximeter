@@ -28,7 +28,7 @@ start the backend API and MQTT worker in separate terminals:
 ```bash
 cd backend
 python -m pip install -r requirements.txt
-alembic -c ../migrations/alembic.ini upgrade head
+flask --app run db upgrade
 python seed_dev_data.py OXI001
 python run.py
 python run_mqtt.py

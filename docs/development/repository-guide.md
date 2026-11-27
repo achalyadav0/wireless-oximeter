@@ -250,7 +250,7 @@ docker compose -f deployment/docker-compose.yml up -d postgres mosquitto
 
 # 2. Backend (from backend/, with .env containing DATABASE_URL)
 python -m pip install -r requirements.txt
-alembic -c ../migrations/alembic.ini upgrade head
+flask --app run db upgrade
 python seed_dev_data.py OXI001
 python run_mqtt.py        # terminal 1
 python run.py             # terminal 2 -> http://127.0.0.1:5000/

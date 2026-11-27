@@ -1,0 +1,16 @@
+[Unit]
+Description=Wireless oximeter dashboard (Flask)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+User=@USER@
+WorkingDirectory=@REPO@/backend
+ExecStart=@REPO@/backend/.venv/bin/python run.py
+Environment=PYTHONUNBUFFERED=1
+Environment=OPEN_BROWSER=0
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

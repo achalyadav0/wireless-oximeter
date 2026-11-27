@@ -1,0 +1,16 @@
+[Unit]
+Description=Wireless oximeter MQTT worker
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+User=@USER@
+WorkingDirectory=@REPO@/backend
+ExecStart=@REPO@/backend/.venv/bin/python run_mqtt.py
+Environment=PYTHONUNBUFFERED=1
+# Exits if the broker is not up yet after boot; systemd retries.
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -41,6 +41,24 @@ dashboard at `http://127.0.0.1:5000/` reads the latest stored data for every
 registered device. The device API is available at
 `http://127.0.0.1:5000/api/devices`.
 
+## Running on a Raspberry Pi
+
+On the Pi, set `FLASK_HOST=0.0.0.0` in `.env` so the dashboard is reachable
+from other devices, then install the backend as above. To start the dashboard
+and MQTT worker on every boot instead of in SSH sessions, run once:
+
+```bash
+deployment/systemd/install.sh
+```
+
+PostgreSQL and Mosquitto already restart with Docker. Check the services and
+their logs with:
+
+```bash
+systemctl status oximeter-dashboard oximeter-mqtt
+journalctl -u oximeter-mqtt -f
+```
+
 ## Device Firmware
 
 The ESP32-S3 firmware is in `device/oximeter/` and uses PlatformIO. Copy
@@ -57,9 +75,9 @@ pio run --target upload
 pio device monitor
 ```
 
-The firmware publishes about four seconds (100 samples at 25 Hz) of MAX30102
-red and infrared samples to
-`oximeter/<device-number>/ppg`. The backend subscribes to
+The firmware samples the MAX30102 continuously at 100 Hz, estimates heart
+rate and SpO2 on the device, and publishes one second (100 samples) of red and
+infrared data with the latest estimate to `oximeter/<device-number>/ppg`. The backend subscribes to
 `oximeter/+/ppg`. See the firmware setup guide for wiring, configuration, and
 the JSON payload contract.
 

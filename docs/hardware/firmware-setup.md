@@ -50,11 +50,16 @@ Each packet is published to the configured PPG topic, normally
   "timestamp_ms": 123456,
   "sample_rate": 100,
   "sample_count": 100,
+  "heart_rate": 72,
+  "spo2": 98,
   "red": [1, 2, 3],
   "ir": [4, 5, 6]
 }
 ```
 
-The production packet contains `sample_count` values in both arrays. The
-backend validates `device_id`, `red`, and `ir`, stores the latest packet in
-memory, and exposes it at `/api/devices` for the dashboard.
+The production packet contains `sample_count` values in both arrays.
+`heart_rate` and `spo2` are computed on the device and are `null` when the
+Maxim algorithm marks them invalid. `DEVICE_ID` must match a device registered
+in the database (see `backend/seed_dev_data.py`). See
+[MQTT telemetry ingestion](../mqtt/telemetry-ingestion.md) for how the backend
+validates and stores each packet.

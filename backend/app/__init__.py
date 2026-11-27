@@ -3,7 +3,7 @@ from sqlalchemy import text
 
 from app.config import Config
 from app.extensions import db, migrate
-from app.dashboard.state import get_devices
+from app.services.dashboard_service import get_device_snapshots
 
 
 
@@ -39,7 +39,7 @@ def create_app(config_class=Config):
 
     @app.get("/api/devices")
     def devices_api():
-        return get_devices()
+        return get_device_snapshots()
 
     @app.get("/")
     def dashboard():

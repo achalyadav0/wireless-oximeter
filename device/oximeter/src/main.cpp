@@ -158,6 +158,19 @@ void publishPPG()
 
 
     // -------------------------------------------------
+    // HR / SpO2 (null when the algorithm rejects them)
+    // -------------------------------------------------
+
+    payload += "\"heart_rate\":";
+    payload += validHeartRate ? String(heartRate) : "null";
+    payload += ",";
+
+    payload += "\"spo2\":";
+    payload += validSpO2 ? String(spo2) : "null";
+    payload += ",";
+
+
+    // -------------------------------------------------
     // RED samples
     // -------------------------------------------------
 

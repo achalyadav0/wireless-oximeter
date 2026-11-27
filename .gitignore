@@ -26,3 +26,11 @@ __pycache__/
 # Mosquitto runtime data
 deployment/mosquitto/data/*
 deployment/mosquitto/log/*
+
+# Python virtual environments and local clones
+.venv/
+venv/
+wireless-oximeter/
+
+# Legacy file-based dashboard output
+latest_devices.json

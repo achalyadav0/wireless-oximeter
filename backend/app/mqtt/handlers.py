@@ -1,6 +1,10 @@
 import json
 
-from app.dashboard.state import update_device
+from app.extensions import db
+from app.services.telemetry_service import TelemetryService
+
+
+telemetry_service = TelemetryService()
 
 
 def handle_vitals_message(topic: str, payload: str):
@@ -12,18 +16,15 @@ def handle_vitals_message(topic: str, payload: str):
         print("Invalid JSON received.")
         return
 
-    if "device_id" not in data:
-        print("Missing device_id")
+    if not isinstance(data, dict):
+        print("PPG payload must be a JSON object.")
         return
 
-    if "red" not in data or "ir" not in data:
-        print(f"Invalid PPG packet from {data['device_id']}")
-        return
-
-    update_device(data)
-
-    print(
-        f"PPG received: "
-        f"{data['device_id']} "
-        f"({data.get('sample_count', 0)} samples)"
-    )
+    try:
+        telemetry_service.process_ppg(data)
+    except ValueError as error:
+        print(f"Rejected PPG packet on {topic}: {error}")
+    except Exception as error:
+        # Keep the worker alive; the service has already rolled back.
+        db.session.rollback()
+        print(f"Failed to persist PPG packet on {topic}: {error!r}")

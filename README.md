@@ -29,12 +29,16 @@ start the backend API and MQTT worker in separate terminals:
 cd backend
 python -m pip install -r requirements.txt
 alembic -c ../migrations/alembic.ini upgrade head
+python seed_dev_data.py OXI001
 python run.py
 python run_mqtt.py
 ```
 
-The dashboard is available at `http://127.0.0.1:5000/` and shows the latest
-PPG packet held in the backend process. The device API is available at
+The seed script registers the test patient, the measurement types, and a
+device whose ID matches the firmware `DEVICE_ID`. Packets from unregistered
+devices are rejected. The MQTT worker stores each packet in PostgreSQL, and the
+dashboard at `http://127.0.0.1:5000/` reads the latest stored data for every
+registered device. The device API is available at
 `http://127.0.0.1:5000/api/devices`.
 
 ## Device Firmware
@@ -60,6 +64,8 @@ the JSON payload contract.
 
 ## Documentation
 
+- [Repository guide](docs/development/repository-guide.md)
+- [Research and thesis report](docs/research/research-report.md)
 - [System architecture](docs/architecture/system-architecture.md)
 - [MQTT telemetry ingestion](docs/mqtt/telemetry-ingestion.md)
 - [ESP32 firmware setup](docs/hardware/firmware-setup.md)

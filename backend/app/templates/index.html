@@ -36,6 +36,14 @@
 			return value === null || value === undefined ? fallback : value;
 		}
 
+		function time(isoString) {
+			return isoString ? new Date(isoString).toLocaleTimeString() : "never";
+		}
+
+		function escapeHtml(text) {
+			return String(text).replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
+		}
+
 		async function refresh() {
 			try {
 				const response = await fetch("/api/devices");
@@ -44,15 +52,17 @@
 				const entries = Object.values(data);
 				devices.innerHTML = entries.length ? entries.map((device) => `
 					<article>
-						<h2>${device.device_id}</h2>
+						<h2>${escapeHtml(device.device_id)}</h2>
 						<dl>
+							<dt>Heart rate</dt><dd>${value(device.heart_rate)} bpm</dd>
+							<dt>SpO2</dt><dd>${value(device.spo2)} %</dd>
 							<dt>Samples</dt><dd>${value(device.sample_count, 0)}</dd>
 							<dt>Sample rate</dt><dd>${value(device.sample_rate)} Hz</dd>
 							<dt>Red channel</dt><dd>${device.red.length} values</dd>
 							<dt>Infrared channel</dt><dd>${device.ir.length} values</dd>
-							<dt>Received</dt><dd>${new Date(device.received_at).toLocaleTimeString()}</dd>
+							<dt>Last seen</dt><dd>${time(device.last_seen_at)}</dd>
 						</dl>
-					</article>`).join("") : '<p class="empty">No devices connected.</p>';
+					</article>`).join("") : '<p class="empty">No devices registered.</p>';
 				updated.textContent = `Updated ${new Date().toLocaleTimeString()}`;
 			} catch (error) {
 				updated.textContent = "Backend unavailable";

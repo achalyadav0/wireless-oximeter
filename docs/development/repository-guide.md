@@ -47,8 +47,7 @@ They never talk to each other directly. **PostgreSQL is the only shared state.**
 1. **Sample** – `main.cpp` reads 100 red and 100 infrared values from the
    MAX30102. The sensor samples at 100 Hz and averages every 4 readings, so
    the effective rate is 25 Hz and one packet holds about 4 seconds of
-   signal. (The packet currently reports `sample_rate: 100`; see the open
-   issues in `docs/research/research-report.md`.)
+   signal. The packet reports `sample_rate: 25`.
 2. **Compute** – the firmware runs the Maxim algorithm
    (`maxim_heart_rate_and_oxygen_saturation`) to estimate heart rate and SpO2.
 3. **Publish** – the firmware builds a JSON packet and publishes it to
@@ -71,7 +70,7 @@ Packet format (from `main.cpp`):
 {
   "device_id": "OXI001",
   "timestamp_ms": 123456,
-  "sample_rate": 100,
+  "sample_rate": 25,
   "sample_count": 100,
   "heart_rate": 72,
   "spo2": 98,

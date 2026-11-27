@@ -295,7 +295,7 @@ Fix or document these before collecting data for the thesis.
 
 | ID | Issue | Impact | Status |
 | --- | --- | --- | --- |
-| I-01 | Firmware reports `sample_rate: 100`, but the effective rate is 25 Hz (100 Hz ÷ 4-sample averaging) | Stored `sample_rate_hz`, `duration_ms` (1 s instead of ~4 s), `started_at` and per-sample time offsets are wrong by 4× | Open – set `SAMPLE_RATE` to 25 in firmware |
+| I-01 | Firmware reports `sample_rate: 100`, but the effective rate is 25 Hz (100 Hz ÷ 4-sample averaging) | Stored `sample_rate_hz`, `duration_ms` (1 s instead of ~4 s), `started_at` and per-sample time offsets are wrong by 4× | Fixed – firmware derives `SAMPLE_RATE` (25) from the sensor configuration |
 | I-02 | All data is assigned to `PATIENT-TEST-001` | Cannot run multi-subject studies | Open – needs device–patient assignment |
 | I-03 | One database row per sample (≈ 50 rows/s per device at 25 Hz × 2 channels) *(estimate)* | Storage growth and write load on the Pi | Open – evaluate array-per-recording layout (RQ3) |
 | I-04 | Dashboard shows the last valid HR/SpO2 even if newer packets were invalid | Possibly stale values displayed | Open |

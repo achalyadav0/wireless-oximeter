@@ -48,7 +48,7 @@ Each packet is published to the configured PPG topic, normally
 {
   "device_id": "OXI001",
   "timestamp_ms": 123456,
-  "sample_rate": 100,
+  "sample_rate": 25,
   "sample_count": 100,
   "heart_rate": 72,
   "spo2": 98,

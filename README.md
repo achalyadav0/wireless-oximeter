@@ -57,7 +57,8 @@ pio run --target upload
 pio device monitor
 ```
 
-The firmware publishes one second of MAX30102 red and infrared samples to
+The firmware publishes about four seconds (100 samples at 25 Hz) of MAX30102
+red and infrared samples to
 `oximeter/<device-number>/ppg`. The backend subscribes to
 `oximeter/+/ppg`. See the firmware setup guide for wiring, configuration, and
 the JSON payload contract.

@@ -24,8 +24,13 @@
 // SENSOR CONFIGURATION
 // =====================================================
 
+// The MAX30102 samples at SENSOR_SAMPLE_RATE and averages SAMPLE_AVERAGE
+// readings into each FIFO sample, so samples arrive at SAMPLE_RATE (25 Hz).
+// The Maxim SpO2 algorithm assumes 25 Hz, and one buffer holds 4 seconds.
+#define SENSOR_SAMPLE_RATE 100
+#define SAMPLE_AVERAGE 4
+#define SAMPLE_RATE (SENSOR_SAMPLE_RATE / SAMPLE_AVERAGE)
 #define BUFFER_SIZE 100
-#define SAMPLE_RATE 100
 
 // =====================================================
 // WI-FI CONFIGURATION
@@ -103,13 +108,22 @@ void connectMQTT()
 
         String clientId = String(DEVICE_ID) + "-" + String((uint32_t)ESP.getEfuseMac(), HEX);
 
-        if (mqttClient.connect(clientId.c_str()))
+        // The broker publishes the retained "offline" will if the ESP32
+        // drops off without disconnecting cleanly.
+        if (mqttClient.connect(
+                clientId.c_str(),
+                nullptr,
+                nullptr,
+                MQTT_STATUS_TOPIC,
+                0,
+                true,
+                "offline"))
         {
             Serial.println("connected.");
 
             mqttClient.publish(
                 MQTT_STATUS_TOPIC,
-                "ESP32 connected",
+                "online",
                 true
             );
         }
@@ -279,9 +293,9 @@ void setup()
     // -------------------------------------------------
 
     byte ledBrightness = 60;
-    byte sampleAverage = 4;
+    byte sampleAverage = SAMPLE_AVERAGE;
     byte ledMode = 2;      // RED + IR
-    int sampleRate = 100;  // 100 Hz
+    int sampleRate = SENSOR_SAMPLE_RATE;
     int pulseWidth = 411;
     int adcRange = 4096;
 
@@ -359,11 +373,11 @@ void loop()
 
 
     // -------------------------------------------------
-    // Collect one second of PPG
+    // Collect one buffer of PPG (4 seconds at 25 Hz)
     // -------------------------------------------------
 
     Serial.println();
-    Serial.println("Collecting 1 second of PPG data...");
+    Serial.println("Collecting 4 seconds of PPG data...");
 
     for (int i = 0; i < BUFFER_SIZE; i++)
     {

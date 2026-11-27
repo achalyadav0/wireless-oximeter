@@ -8,13 +8,12 @@ from app.models.ppg_recording import PPGRecording
 from app.models.sensor import Sensor
 
 
-# The firmware publishes a packet roughly every 4 seconds (100 samples at
-# 25 Hz), so a device silent for longer than this is treated as disconnected.
-ONLINE_TIMEOUT_SECONDS = 10
+# The firmware publishes a packet every second (100 samples at 100 Hz), so a
+# device silent for longer than this is treated as disconnected.
+ONLINE_TIMEOUT_SECONDS = 5
 
-# MAX30102 infrared readings stay well below this without a finger on the
-# sensor (same threshold as the SparkFun presence examples).
-FINGER_IR_THRESHOLD = 50000
+# Same infrared level the firmware's algorithm uses to detect a finger.
+FINGER_IR_THRESHOLD = 20000
 
 
 def get_device_snapshots() -> dict:

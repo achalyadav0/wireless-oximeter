@@ -44,14 +44,15 @@ They never talk to each other directly. **PostgreSQL is the only shared state.**
 
 ## 2. Life of one packet
 
-1. **Sample** – `main.cpp` reads 100 red and 100 infrared values from the
-   MAX30102. The sensor samples at 100 Hz and averages every 4 readings, so
-   the effective rate is 25 Hz and one packet holds about 4 seconds of
-   signal. The packet reports `sample_rate: 25`.
-2. **Compute** – the firmware runs the Maxim algorithm
-   (`maxim_heart_rate_and_oxygen_saturation`) to estimate heart rate and SpO2.
-3. **Publish** – the firmware builds a JSON packet and publishes it to
-   `oximeter/<n>/ppg` on the Mosquitto broker.
+1. **Sample** – `main.cpp` drains the MAX30102 FIFO continuously. The sensor
+   converts at 400 samples/s and averages every 4 readings, so samples arrive
+   at 100 Hz; one packet holds 100 samples (1 second).
+2. **Compute** – every pair of samples is averaged and fed at 50 Hz to
+   `ppg_algorithm.cpp`, which tracks heart rate and SpO2 over a sliding
+   ~10-second window and withholds values it cannot verify.
+3. **Publish** – the firmware builds a JSON packet and hands it to
+   `telemetry.cpp`, which publishes it to `oximeter/<n>/ppg` from its own task
+   so sampling never waits for the network.
 4. **Receive** – `mqtt/client.py` (subscribed to `oximeter/+/ppg`) passes the
    raw text to `handle_vitals_message` in `mqtt/handlers.py`.
 5. **Validate and store** – the handler parses JSON and calls
@@ -70,7 +71,7 @@ Packet format (from `main.cpp`):
 {
   "device_id": "OXI001",
   "timestamp_ms": 123456,
-  "sample_rate": 25,
+  "sample_rate": 100,
   "sample_count": 100,
   "heart_rate": 72,
   "spo2": 98,
@@ -110,8 +111,12 @@ Packet format (from `main.cpp`):
 
 | File | Responsibility |
 | --- | --- |
-| `platformio.ini` | Build target (`esp32-s3-devkitc-1`, Arduino framework), serial speed, and libraries: SparkFun MAX3010x and PubSubClient (MQTT) |
-| `src/main.cpp` | The whole firmware. `setup()` starts I2C on GPIO 8/9, configures the MAX30102 (red + IR, 100 Hz with 4-sample averaging = 25 Hz output, pulse width 411 µs, ADC range 4096), connects Wi-Fi and MQTT. `loop()` keeps connections alive, captures 100 samples, computes HR/SpO2, and calls `publishPPG()` to send the JSON packet |
+| `platformio.ini` | Build targets (`esp32-s3-devkitc-1` default, `esp32dev` for a classic ESP32), serial speed, and the PubSubClient (MQTT) library |
+| `include/config.h` | Build-time settings: I2C pins per board, sample rate, MQTT queue sizes; values can be overridden in `secrets.h` |
+| `src/main.cpp` | Ties the modules together: starts the sensor (with retry and I2C bus recovery), drains the FIFO, feeds the algorithm, runs LED auto-gain and sample-rate correction, and builds the JSON packet once per 100 samples |
+| `src/max30102.*` | Register-level MAX30102 driver: 400 sps with 4x averaging (100 Hz out), 411 µs pulses, read-back-verified configuration, FIFO reads, LED auto-gain, bus scan and recovery |
+| `src/ppg_algorithm.*` | Hardware-independent HR/SpO2 estimation: band-pass and DC normalisation, red/IR motion separation, Bayesian spectral HR tracker checked against a beat detector, ratio-of-ratios SpO2 with artifact tests and the RD117 calibration curve |
+| `src/telemetry.*` | Wi-Fi and MQTT in a FreeRTOS task on core 0, with an offline send queue and a retained online/offline status message (last will) |
 | `include/secrets.example.h` | Template for Wi-Fi name/password, broker IP, `DEVICE_ID`, and MQTT topics. Copy to `secrets.h` (git-ignored). `main.cpp` falls back to the example when `secrets.h` is missing so clean checkouts still compile |
 | `.gitignore` | Ignores `.pio/` build output and `include/secrets.h` |
 | `.vscode/extensions.json`, `.vscode/settings.json` | PlatformIO editor recommendations |

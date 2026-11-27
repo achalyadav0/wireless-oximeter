@@ -1,19 +1,22 @@
 # ESP32 Firmware Setup
 
-The firmware targets an ESP32-S3 DevKitC-1 connected to a MAX30102 sensor.
-PlatformIO manages the Arduino framework and the two required libraries.
+The firmware targets an ESP32-S3 DevKitC-1 (default) or a classic ESP32 Dev
+Module connected to a MAX30102 sensor. PlatformIO manages the Arduino framework
+and the PubSubClient MQTT library; the MAX30102 driver is part of the firmware.
 
 ## Wiring
 
-| MAX30102 | ESP32-S3 |
-| --- | --- |
-| SDA | GPIO 8 |
-| SCL | GPIO 9 |
-| VIN | 3.3 V |
-| GND | GND |
+| MAX30102 | ESP32-S3 | Classic ESP32 |
+| --- | --- | --- |
+| SDA | GPIO 8 | GPIO 21 |
+| SCL | GPIO 9 | GPIO 22 |
+| VIN | 3.3 V | 3.3 V |
+| GND | GND | GND |
 
-The pin assignments are defined near the top of `device/oximeter/src/main.cpp`.
-Change them there if the board wiring differs.
+The defaults are in `device/oximeter/include/config.h` and follow the board
+being built. To use other pins, define `SDA_PIN` and `SCL_PIN` in `secrets.h`.
+
+Build for the classic ESP32 with `pio run -e esp32dev --target upload`.
 
 ## Configure and Upload
 
@@ -48,7 +51,7 @@ Each packet is published to the configured PPG topic, normally
 {
   "device_id": "OXI001",
   "timestamp_ms": 123456,
-  "sample_rate": 25,
+  "sample_rate": 100,
   "sample_count": 100,
   "heart_rate": 72,
   "spo2": 98,
@@ -59,7 +62,10 @@ Each packet is published to the configured PPG topic, normally
 
 The production packet contains `sample_count` values in both arrays.
 `heart_rate` and `spo2` are computed on the device and are `null` when the
-Maxim algorithm marks them invalid. `DEVICE_ID` must match a device registered
+algorithm cannot verify them (no finger, warm-up, motion it cannot separate).
+The packet also carries `state`, `contact`, `quality`, `pi`, `motion`,
+`fw_version` and `utc_ms` (0 until NTP time is available); the backend stores
+only the fields listed in the MQTT ingestion guide and ignores the rest. `DEVICE_ID` must match a device registered
 in the database (see `backend/seed_dev_data.py`). See
 [MQTT telemetry ingestion](../mqtt/telemetry-ingestion.md) for how the backend
 validates and stores each packet.
